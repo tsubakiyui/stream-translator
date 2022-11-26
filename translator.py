@@ -8,6 +8,7 @@ import whisper
 from whisper.audio import SAMPLE_RATE
 
 import json
+import zhconv
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
@@ -200,10 +201,11 @@ def main(url, model="small", language=None, interval=5, history_buffer_size=0, p
             if result.get("text").strip != "":
                 # 如果language == auto,执行
                 if not language:
+                    # 如果language为中文直接输出
                     if result.get("language") == "zh":
                         print(
                         f'{datetime.now().strftime("%H:%M:%S")} '
-                        f'{result.get("text")}')
+                        f'{zhconv.convert(result.get("text"), "zh-cn")}')
                     else:
                         print(
                         f'{datetime.now().strftime("%H:%M:%S")} '
@@ -212,7 +214,7 @@ def main(url, model="small", language=None, interval=5, history_buffer_size=0, p
                 elif language == "chinese":
                     print(
                     f'{datetime.now().strftime("%H:%M:%S")} '
-                    f'{result.get("text")}')
+                    f'{zhconv.convert(result.get("text"), "zh-cn")}')
                 # 其余直接翻译
                 else:
                     print(
