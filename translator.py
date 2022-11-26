@@ -197,10 +197,15 @@ def main(url, model="small", language=None, interval=5, history_buffer_size=0, p
                 audio_buffer.clear()
                 previous_text.clear()
             
-
-            print(f'{datetime.now().strftime("%H:%M:%S")} '
-                  f'{result.get("language")}\n'
-                  f'{"" if language else "(" + result.get("language") + ")"} {translate(result.get("text"))}')
+            if result.get("text") != "":
+                if result.get("language") == "zh":
+                    print(
+                    f'{datetime.now().strftime("%H:%M:%S")} '
+                    f'{result.get("text")}')
+                else:
+                    print(
+                    f'{datetime.now().strftime("%H:%M:%S")} '
+                    f'{translate(result.get("text"))}')
 
         print("Stream ended")
     finally:
