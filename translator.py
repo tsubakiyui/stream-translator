@@ -7,7 +7,7 @@ import numpy as np
 import whisper
 from whisper.audio import SAMPLE_RATE
 
-
+import json
 from tencentcloud.common import credential
 from tencentcloud.common.profile.client_profile import ClientProfile
 from tencentcloud.common.profile.http_profile import HttpProfile
@@ -109,6 +109,8 @@ def open_stream(stream, direct_url, preferred_quality):
     return ffmpeg_process, streamlink_process
 
 def translate(text):
+    if text == "":
+      return ""
     try:
         with open("/content/drive/MyDrive/stream-translator-config.json", encoding='utf-8') as f:
             config = json.load(f)
