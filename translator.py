@@ -8,6 +8,12 @@ import whisper
 from whisper.audio import SAMPLE_RATE
 
 
+from tencentcloud.common import credential
+from tencentcloud.common.profile.client_profile import ClientProfile
+from tencentcloud.common.profile.http_profile import HttpProfile
+from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
+from tencentcloud.tmt.v20180321 import tmt_client, models
+
 class RingBuffer:
     def __init__(self, size):
         self.size = size
@@ -102,6 +108,41 @@ def open_stream(stream, direct_url, preferred_quality):
     thread.start()
     return ffmpeg_process, streamlink_process
 
+def translate(text):
+    try:
+        with open("/content/drive/MyDrive/stream-translator-config.json", encoding='utf-8') as f:
+            config = json.load(f)
+        # 实例化一个认证对象，入参需要传入腾讯云账户secretId，secretKey,此处还需注意密钥对的保密
+        # 密钥可前往https://console.cloud.tencent.com/cam/capi网站进行获取
+        cred = credential.Credential(config['secretId'], config['secretKey'])
+        # 实例化一个http选项，可选的，没有特殊需求可以跳过
+        httpProfile = HttpProfile()
+        httpProfile.endpoint = "tmt.tencentcloudapi.com"
+
+        # 实例化一个client选项，可选的，没有特殊需求可以跳过
+        clientProfile = ClientProfile()
+        clientProfile.httpProfile = httpProfile
+        # 实例化要请求产品的client对象,clientProfile是可选的
+        client = tmt_client.TmtClient(cred, "eu-frankfurt", clientProfile)
+
+        # 实例化一个请求对象,每个接口都会对应一个request对象
+        req = models.TextTranslateRequest()
+        params = {
+            "SourceText": text,
+            "Source": "auto",
+            "Target": "zh",
+            "ProjectId": 0
+        }
+        req.from_json_string(json.dumps(params))
+
+        # 返回的resp是一个TextTranslateResponse的实例，与请求对象对应
+        resp = client.TextTranslate(req)
+        # 输出json格式的字符串回包
+        return resp.TargetText
+
+    except TencentCloudSDKException as err:
+        print(err)
+
 
 def main(url, model="small", language=None, interval=5, history_buffer_size=0, preferred_quality="audio_only",
          use_vad=True, direct_url=False, **decode_options):
@@ -155,7 +196,7 @@ def main(url, model="small", language=None, interval=5, history_buffer_size=0, p
                 previous_text.clear()
                 
             print(f'{datetime.now().strftime("%H:%M:%S")} '
-                  f'{"" if language else "(" + result.get("language") + ")"} {result.get("text")}')
+                  f'{"" if language else "(" + result.get("language") + ")"} {translate(result.get("text"))}')
 
         print("Stream ended")
     finally:
@@ -175,7 +216,7 @@ def cli():
                              'English audio.')
     parser.add_argument('--task', type=str, choices=['transcribe', 'translate'], default='transcribe',
                         help='Whether to transcribe the audio (keep original language) or translate to English.')
-    parser.add_argument('--language', type=str, default='auto',
+    parser.add_argument('--language', type=str, default='japanese',
                         help='Language spoken in the stream. Default option is to auto detect the spoken language. '
                              'See https://github.com/openai/whisper for available languages.')
     parser.add_argument('--interval', type=int, default=5,
