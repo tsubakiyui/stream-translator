@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore")
 
 class VAD:
     def __init__(self):
-        self.model = init_jit_model("silero_vad.jit")
+        self.model = init_jit_model("/content/stream-translator/silero_vad.jit")
 
     def no_speech(self, audio):
         speech = get_speech_timestamps(torch.Tensor(audio), self.model, return_seconds=True)
