@@ -196,8 +196,10 @@ def main(url, model="small", language=None, interval=5, history_buffer_size=0, p
             if clear_buffers or previous_text.has_repetition():
                 audio_buffer.clear()
                 previous_text.clear()
-                
+            
+
             print(f'{datetime.now().strftime("%H:%M:%S")} '
+                  f'{result.get("language")}\n'
                   f'{"" if language else "(" + result.get("language") + ")"} {translate(result.get("text"))}')
 
         print("Stream ended")
