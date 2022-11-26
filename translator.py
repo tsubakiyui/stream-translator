@@ -203,23 +203,29 @@ def main(url, model="small", language=None, interval=5, history_buffer_size=0, p
                 if not language:
                     # 如果language为中文直接输出
                     if result.get("language") == "zh":
+                        content = zhconv.convert(result.get("text"), "zh-cn")
                         print(
                         f'{datetime.now().strftime("%H:%M:%S")} '
-                        f'{zhconv.convert(result.get("text"), "zh-cn")}')
+                        f'{content}')
+                        
                     else:
+                        content = translate(result.get("text"))
                         print(
                         f'{datetime.now().strftime("%H:%M:%S")} '
-                        f'{translate(result.get("text"))}')
+                        f'{content}')
+                        
                 # 如果language为中文直接输出
                 elif language == "chinese":
+                    content = zhconv.convert(result.get("text"), "zh-cn")
                     print(
                     f'{datetime.now().strftime("%H:%M:%S")} '
-                    f'{zhconv.convert(result.get("text"), "zh-cn")}')
+                    f'{content}')
                 # 其余直接翻译
                 else:
+                    content = translate(result.get("text"))
                     print(
                     f'{datetime.now().strftime("%H:%M:%S")} '
-                    f'{translate(result.get("text"))}')
+                    f'{content}')
 
         print("Stream ended")
     finally:
