@@ -239,7 +239,7 @@ def cli():
                              'English audio.')
     parser.add_argument('--task', type=str, choices=['transcribe', 'translate'], default='transcribe',
                         help='Whether to transcribe the audio (keep original language) or translate to English.')
-    parser.add_argument('--language', type=str, default='japanese',
+    parser.add_argument('--language', type=str, default='auto',
                         help='Language spoken in the stream. Default option is to auto detect the spoken language. '
                              'See https://github.com/openai/whisper for available languages.')
     parser.add_argument('--interval', type=int, default=5,
