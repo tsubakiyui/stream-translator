@@ -197,11 +197,23 @@ def main(url, model="small", language=None, interval=5, history_buffer_size=0, p
                 audio_buffer.clear()
                 previous_text.clear()
             
-            if result.get("text") != "":
-                if result.get("language") == "zh":
+            if result.get("text").strip != "":
+                # 如果language == auto,执行
+                if not language:
+                    if result.get("language") == "zh":
+                        print(
+                        f'{datetime.now().strftime("%H:%M:%S")} '
+                        f'{result.get("text")}')
+                    else:
+                        print(
+                        f'{datetime.now().strftime("%H:%M:%S")} '
+                        f'{translate(result.get("text"))}')
+                # 如果language为中文直接输出
+                elif language == "chinese":
                     print(
                     f'{datetime.now().strftime("%H:%M:%S")} '
                     f'{result.get("text")}')
+                # 其余直接翻译
                 else:
                     print(
                     f'{datetime.now().strftime("%H:%M:%S")} '
